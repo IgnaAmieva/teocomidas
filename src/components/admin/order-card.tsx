@@ -46,14 +46,11 @@ export default function OrderCard({
 
   return (
     <div className="rounded-2xl border-2 border-zinc-200 bg-white p-4 shadow-sm">
-      {/* Header: hora + modalidad */}
+      {/* Header: numero_pedido + modalidad */}
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="text-2xl font-extrabold tabular-nums">
-            {formatHora(pedido.created_at)}
-          </span>
-          <span className="ml-2 text-sm text-zinc-400">
-            {timeAgo(pedido.created_at)}
+          <span className="text-3xl font-extrabold tabular-nums">
+            #{pedido.numero_pedido}
           </span>
         </div>
         <span
@@ -67,9 +64,12 @@ export default function OrderCard({
         </span>
       </div>
 
-      {/* Cliente */}
+      {/* Cliente + hora */}
       <div className="mt-3">
         <p className="text-xl font-extrabold">{pedido.nombre_cliente}</p>
+        <p className="text-sm text-zinc-400">
+          {formatHora(pedido.created_at)} · {timeAgo(pedido.created_at)}
+        </p>
         {pedido.horario_solicitado && (
           <p className="text-sm text-zinc-500">
             Quiere para las {pedido.horario_solicitado} hs
@@ -77,17 +77,12 @@ export default function OrderCard({
         )}
       </div>
 
-      {/* Auto car info — grande y visible */}
-      {esAutoCar && pedido.patente && (
-        <div className="mt-3 rounded-xl bg-blue-50 p-3">
-          <p className="text-center text-3xl font-extrabold tracking-widest text-blue-900">
-            {pedido.patente}
+      {/* Auto car info — color/modelo como dato secundario */}
+      {esAutoCar && pedido.color_auto && (
+        <div className="mt-3 rounded-xl bg-blue-50 px-3 py-2">
+          <p className="text-center text-sm font-semibold text-blue-800">
+            🚗 {pedido.color_auto}
           </p>
-          {pedido.color_auto && (
-            <p className="mt-1 text-center text-sm font-semibold text-blue-700">
-              {pedido.color_auto}
-            </p>
-          )}
         </div>
       )}
 

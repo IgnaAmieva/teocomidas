@@ -10,7 +10,7 @@ interface CreatePedidoParams {
 // Usa service_role — solo llamar desde API routes server-side
 export async function createPedido(
   params: CreatePedidoParams
-): Promise<Result<{ id: string }>> {
+): Promise<Result<{ id: string; numero_pedido: number }>> {
   try {
     const admin = getSupabaseAdmin();
 
@@ -30,17 +30,12 @@ export async function createPedido(
         horario_solicitado:
           params.form.horario === "asap" ? null : params.form.horario,
         nombre_cliente: params.form.nombre_cliente,
-        patente:
-          params.form.modalidad === "auto_car"
-            ? params.form.patente || null
-            : null,
         color_auto:
           params.form.modalidad === "auto_car"
             ? params.form.color_auto || null
             : null,
-        // No setear estado ni mp_status — usan los defaults de la DB
       })
-      .select("id")
+      .select("id, numero_pedido")
       .single();
 
     if (error || !data) {
@@ -50,7 +45,10 @@ export async function createPedido(
       };
     }
 
-    return { success: true, data: { id: data.id } };
+    return {
+      success: true,
+      data: { id: data.id, numero_pedido: data.numero_pedido },
+    };
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Error inesperado al crear pedido";

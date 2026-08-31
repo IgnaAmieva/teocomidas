@@ -3,7 +3,7 @@ import { createPedido } from "@/services/pedidos";
 import { createPaymentPreference } from "@/services/mercadopago";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { checkoutBodySchema } from "@/lib/validations";
-import { sanitizeString, sanitizePatente } from "@/lib/sanitize";
+import { sanitizeString } from "@/lib/sanitize";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
@@ -30,17 +30,8 @@ export async function POST(req: NextRequest) {
 
     const { form, items } = parsed.data;
 
-    // Validación de negocio: auto_car requiere patente
-    if (form.modalidad === "auto_car" && !form.patente.trim()) {
-      return NextResponse.json(
-        { success: false, error: "La patente es requerida para Auto Car" },
-        { status: 400 }
-      );
-    }
-
     // Sanitizar inputs de texto libre
     form.nombre_cliente = sanitizeString(form.nombre_cliente);
-    form.patente = sanitizePatente(form.patente);
     form.color_auto = sanitizeString(form.color_auto);
 
     // Recalcular total con precios REALES de la base de datos
@@ -112,6 +103,7 @@ export async function POST(req: NextRequest) {
 
     const mpResult = await createPaymentPreference({
       pedidoId: pedidoResult.data.id,
+      numeroPedido: pedidoResult.data.numero_pedido,
       items: itemsConPreciosReales,
       appUrl,
     });
@@ -124,6 +116,7 @@ export async function POST(req: NextRequest) {
       success: true,
       data: {
         pedidoId: pedidoResult.data.id,
+        numeroPedido: pedidoResult.data.numero_pedido,
         initPoint: mpResult.data.initPoint,
       },
     });

@@ -2,10 +2,12 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartItem, Producto } from "./types";
+import type { CartItem, Modalidad, Producto } from "./types";
 
 interface CartState {
   items: CartItem[];
+  modalidad: Modalidad;
+  setModalidad: (m: Modalidad) => void;
   addItem: (producto: Producto, cantidad?: number) => void;
   removeItem: (productoId: string) => void;
   updateQuantity: (productoId: string, cantidad: number) => void;
@@ -18,6 +20,9 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      modalidad: "retiro" as Modalidad,
+
+      setModalidad: (m) => set({ modalidad: m }),
 
       addItem: (producto, cantidad = 1) => {
         set((state) => {
@@ -55,7 +60,7 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], modalidad: "retiro" }),
 
       totalItems: () => get().items.reduce((sum, i) => sum + i.cantidad, 0),
 

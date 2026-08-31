@@ -7,7 +7,6 @@ export const checkoutFormSchema = z.object({
     .string()
     .min(2, "El nombre debe tener al menos 2 caracteres")
     .max(100, "El nombre es demasiado largo"),
-  patente: z.string().max(10).default(""),
   color_auto: z.string().max(100).default(""),
 });
 
@@ -35,14 +34,3 @@ export const adminPedidoActionSchema = z.object({
   pedidoId: z.string().uuid(),
   accion: z.literal("avanzar_estado"),
 });
-
-// Validación refinada: si modalidad es auto_car, patente es obligatoria
-export const checkoutFormRefined = checkoutFormSchema.refine(
-  (data) => {
-    if (data.modalidad === "auto_car") {
-      return data.patente.trim().length > 0;
-    }
-    return true;
-  },
-  { message: "La patente es requerida para Auto Car", path: ["patente"] }
-);

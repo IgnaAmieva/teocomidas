@@ -9,6 +9,7 @@ function getClient() {
 
 interface CreatePreferenceParams {
   pedidoId: string;
+  numeroPedido: number;
   items: CartItem[];
   appUrl: string;
 }
@@ -35,9 +36,9 @@ export async function createPaymentPreference(
           currency_id: "ARS",
         })),
         back_urls: {
-          success: `${params.appUrl}/pedido-confirmado?pedido_id=${params.pedidoId}`,
-          failure: `${params.appUrl}/pedido-confirmado?pedido_id=${params.pedidoId}`,
-          pending: `${params.appUrl}/pedido-confirmado?pedido_id=${params.pedidoId}`,
+          success: `${params.appUrl}/pedido-confirmado?numero_pedido=${params.numeroPedido}`,
+          failure: `${params.appUrl}/pedido-confirmado?numero_pedido=${params.numeroPedido}`,
+          pending: `${params.appUrl}/pedido-confirmado?numero_pedido=${params.numeroPedido}`,
         },
         auto_return: "approved",
         external_reference: params.pedidoId,

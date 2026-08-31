@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { Categoria, Producto } from "@/lib/types";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import type { Categoria, Modalidad, Producto } from "@/lib/types";
 import {
   getCategoriaActual,
   categoriaLabels,
@@ -9,12 +10,23 @@ import {
 } from "@/lib/get-categoria-actual";
 import { supabase } from "@/lib/supabase";
 import { mockProductos } from "@/lib/mock-productos";
+import { useCartStore } from "@/lib/cart-store";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
 
 const categorias: Categoria[] = ["desayuno", "almuerzo", "merienda", "cena"];
 
-export default function MenuPage() {
+function MenuContent() {
+  const searchParams = useSearchParams();
+  const setModalidad = useCartStore((s) => s.setModalidad);
+
+  useEffect(() => {
+    const param = searchParams.get("modalidad");
+    if (param === "retiro" || param === "auto_car") {
+      setModalidad(param as Modalidad);
+    }
+  }, [searchParams, setModalidad]);
+
   const [categoriaActiva, setCategoriaActiva] = useState<Categoria>(
     getCategoriaActual
   );
@@ -111,5 +123,29 @@ export default function MenuPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function MenuPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="px-4 pt-6">
+          <div className="h-8 w-24 animate-pulse rounded bg-zinc-200" />
+          <div className="mt-4 flex gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-10 w-24 animate-pulse rounded-full bg-zinc-200" />
+            ))}
+          </div>
+          <div className="mt-4 space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-[104px] animate-pulse rounded-2xl bg-zinc-200" />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <MenuContent />
+    </Suspense>
   );
 }

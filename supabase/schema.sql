@@ -27,16 +27,19 @@ create policy "productos_select_public"
 -- Esto previene que un usuario autenticado modifique el menú.
 
 
+-- Secuencia para números de pedido correlativos
+create sequence if not exists pedidos_numero_seq;
+
 -- Tabla de pedidos
 create table if not exists pedidos (
   id uuid default gen_random_uuid() primary key,
+  numero_pedido integer not null default nextval('pedidos_numero_seq'),
   created_at timestamptz not null default now(),
   items jsonb not null,
   total numeric(10,2) not null,
   modalidad text not null check (modalidad in ('retiro', 'auto_car')),
   horario_solicitado text,
   nombre_cliente text not null,
-  patente text,
   color_auto text,
   estado text not null default 'pendiente'
     check (estado in ('pendiente', 'en_preparacion', 'listo', 'entregado')),

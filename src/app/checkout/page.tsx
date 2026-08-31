@@ -10,6 +10,7 @@ import type { CheckoutFormData, Modalidad, Result } from "@/lib/types";
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
   const totalPrice = useCartStore((s) => s.totalPrice);
+  const storedModalidad = useCartStore((s) => s.modalidad);
 
   const [mounted, setMounted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -19,7 +20,6 @@ export default function CheckoutPage() {
     modalidad: "retiro",
     horario: "asap",
     nombre_cliente: "",
-    patente: "",
     color_auto: "",
   });
 
@@ -28,7 +28,9 @@ export default function CheckoutPage() {
   useEffect(() => {
     setMounted(true);
     setHorarios(getHorariosDisponibles());
-  }, []);
+    // Preseleccionar la modalidad elegida en el inicio
+    setForm((prev) => ({ ...prev, modalidad: storedModalidad }));
+  }, [storedModalidad]);
 
   if (!mounted) return null;
 
@@ -59,9 +61,7 @@ export default function CheckoutPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  const canSubmit =
-    form.nombre_cliente.trim().length > 0 &&
-    (form.modalidad !== "auto_car" || form.patente.trim().length > 0);
+  const canSubmit = form.nombre_cliente.trim().length > 0;
 
   async function handleSubmit() {
     if (!canSubmit || submitting) return;
@@ -76,8 +76,11 @@ export default function CheckoutPage() {
         body: JSON.stringify({ form, items, total }),
       });
 
-      const result: Result<{ pedidoId: string; initPoint: string }> =
-        await res.json();
+      const result: Result<{
+        pedidoId: string;
+        numeroPedido: number;
+        initPoint: string;
+      }> = await res.json();
 
       if (!result.success) {
         setError(result.error);
@@ -185,25 +188,13 @@ export default function CheckoutPage() {
           />
 
           {form.modalidad === "auto_car" && (
-            <>
-              <input
-                type="text"
-                placeholder="Patente del auto *"
-                value={form.patente}
-                onChange={(e) =>
-                  updateField("patente", e.target.value.toUpperCase())
-                }
-                maxLength={10}
-                className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-base font-semibold uppercase placeholder:text-zinc-400 placeholder:normal-case focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
-              />
-              <input
-                type="text"
-                placeholder="Color / modelo del auto (opcional)"
-                value={form.color_auto}
-                onChange={(e) => updateField("color_auto", e.target.value)}
-                className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-base font-semibold placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
-              />
-            </>
+            <input
+              type="text"
+              placeholder="Color / modelo del auto (opcional)"
+              value={form.color_auto}
+              onChange={(e) => updateField("color_auto", e.target.value)}
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-base font-semibold placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+            />
           )}
         </div>
       </section>

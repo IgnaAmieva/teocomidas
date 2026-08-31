@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center px-6 pt-16">
@@ -14,12 +18,18 @@ export default function HomePage() {
       </p>
 
       <div className="grid w-full gap-3">
-        <button className="rounded-xl bg-zinc-900 px-6 py-4 text-lg font-bold text-white transition-colors active:bg-zinc-700">
-          Retiro en el local
-        </button>
-        <button className="rounded-xl border-2 border-zinc-900 px-6 py-4 text-lg font-bold text-zinc-900 transition-colors active:bg-zinc-100">
-          Auto Car
-        </button>
+        <Link
+          href="/menu?modalidad=retiro"
+          className="rounded-xl bg-zinc-900 px-6 py-4 text-center text-lg font-bold text-white transition-colors active:bg-zinc-700"
+        >
+          🏪 Retiro en el local
+        </Link>
+        <Link
+          href="/menu?modalidad=auto_car"
+          className="rounded-xl border-2 border-zinc-900 px-6 py-4 text-center text-lg font-bold text-zinc-900 transition-colors active:bg-zinc-100"
+        >
+          🚗 Auto Car
+        </Link>
       </div>
 
       <p className="mt-10 text-center text-sm text-zinc-400">

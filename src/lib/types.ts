@@ -37,13 +37,13 @@ export interface PedidoItem {
 
 export interface Pedido {
   id: string;
+  numero_pedido: number;
   created_at: string;
   items: PedidoItem[];
   total: number;
   modalidad: Modalidad;
   horario_solicitado: string | null;
   nombre_cliente: string;
-  patente: string | null;
   color_auto: string | null;
   estado: EstadoPedido;
   mp_payment_id: string | null;
@@ -54,7 +54,6 @@ export interface CheckoutFormData {
   modalidad: Modalidad;
   horario: "asap" | string;
   nombre_cliente: string;
-  patente: string;
   color_auto: string;
 }
 

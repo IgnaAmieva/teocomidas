@@ -39,6 +39,8 @@ const nextConfig = {
               "img-src 'self' data: blob: https://*.supabase.co https://http2.mlstatic.com",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mercadopago.com",
               "frame-src https://sdk.mercadopago.com https://www.mercadopago.com.ar",
+              "worker-src 'self'",
+              "manifest-src 'self'",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

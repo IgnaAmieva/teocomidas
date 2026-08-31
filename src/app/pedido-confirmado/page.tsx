@@ -54,7 +54,7 @@ function PedidoConfirmadoContent() {
 
   const mpStatus =
     searchParams.get("collection_status") || searchParams.get("status");
-  const pedidoId = searchParams.get("pedido_id");
+  const numeroPedido = searchParams.get("numero_pedido");
   const status = resolveStatus(mpStatus);
   const config = statusConfig[status];
 
@@ -77,13 +77,18 @@ function PedidoConfirmadoContent() {
 
       <p className="mt-3 text-center text-zinc-500">{config.description}</p>
 
-      {pedidoId && (
-        <p className="mt-4 rounded-xl bg-zinc-100 px-4 py-2 text-center text-sm text-zinc-600">
-          Pedido:{" "}
-          <span className="font-mono font-bold">
-            {pedidoId.slice(0, 8).toUpperCase()}
-          </span>
-        </p>
+      {numeroPedido && (
+        <div className="mt-6 rounded-2xl bg-zinc-900 px-6 py-5 text-center">
+          <p className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+            Tu número de pedido
+          </p>
+          <p className="mt-1 text-5xl font-extrabold tabular-nums text-white">
+            #{numeroPedido}
+          </p>
+          <p className="mt-2 text-sm text-zinc-400">
+            Mostrá este número cuando retires tu pedido
+          </p>
+        </div>
       )}
 
       <div className="mt-8 flex w-full flex-col gap-3">
