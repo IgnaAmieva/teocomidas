@@ -34,9 +34,16 @@ export default function AdminPage() {
   });
 
   async function handleAvanzar(pedidoId: string) {
+    // Obtener el token de la sesión activa de Supabase (guardada en localStorage)
+    const session = await supabase?.auth.getSession();
+    const token = session?.data?.session?.access_token;
+
     const res = await fetch("/api/admin/pedidos", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ pedidoId, accion: "avanzar_estado" }),
     });
     const result = await res.json();
