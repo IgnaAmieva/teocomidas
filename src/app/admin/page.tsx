@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { usePedidosRealtime } from "@/hooks/use-pedidos-realtime";
 import { useNotificationSound } from "@/hooks/use-notification-sound";
-import OrderColumn from "@/components/admin/order-column";
+import OrderStack from "@/components/admin/order-stack";
 import type { EstadoPedido } from "@/lib/types";
 
-const ESTADOS: EstadoPedido[] = [
-  "pendiente",
-  "en_preparacion",
-  "listo",
-  "entregado",
+const TABS: { estado: EstadoPedido; label: string; color: string; activeColor: string }[] = [
+  { estado: "pendiente", label: "Pendiente", color: "text-amber-700", activeColor: "bg-amber-500 text-white" },
+  { estado: "en_preparacion", label: "En prep.", color: "text-orange-700", activeColor: "bg-orange-500 text-white" },
+  { estado: "listo", label: "Listo", color: "text-green-700", activeColor: "bg-green-600 text-white" },
+  { estado: "entregado", label: "Entregado", color: "text-zinc-500", activeColor: "bg-zinc-700 text-white" },
 ];
 
 export default function AdminPage() {
@@ -20,6 +20,7 @@ export default function AdminPage() {
   const playSound = useNotificationSound();
   const [soloHoy, setSoloHoy] = useState(true);
   const [flash, setFlash] = useState(false);
+  const [tabActivo, setTabActivo] = useState<EstadoPedido>("pendiente");
 
   const handleNuevoPedido = useCallback(() => {
     playSound();
@@ -50,6 +51,17 @@ export default function AdminPage() {
     router.replace("/admin/login");
   }
 
+  // Count per estado
+  const contadores = TABS.reduce(
+    (acc, tab) => {
+      acc[tab.estado] = pedidos.filter((p) => p.estado === tab.estado).length;
+      return acc;
+    },
+    {} as Record<EstadoPedido, number>
+  );
+
+  const pedidosFiltrados = pedidos.filter((p) => p.estado === tabActivo);
+
   return (
     <div className="min-h-screen bg-zinc-100">
       {/* Notificación flash de nuevo pedido */}
@@ -60,19 +72,16 @@ export default function AdminPage() {
       )}
 
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white px-4 py-3 lg:px-6">
+      <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 text-sm font-extrabold text-white">
               TC
             </div>
-            <h1 className="text-xl font-extrabold lg:text-2xl">
-              Pedidos
-            </h1>
+            <h1 className="text-xl font-extrabold">Pedidos</h1>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Filtro hoy / historial */}
             <div className="flex rounded-xl border border-zinc-200 bg-zinc-50 p-1">
               <button
                 onClick={() => setSoloHoy(true)}
@@ -106,23 +115,49 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* Board */}
-      <main className="p-4 lg:p-6">
+      {/* Tabs de estado */}
+      <div className="sticky top-[61px] z-30 border-b border-zinc-200 bg-white px-2 py-2">
+        <div className="flex gap-1.5">
+          {TABS.map((tab) => {
+            const isActive = tabActivo === tab.estado;
+            const count = contadores[tab.estado];
+            return (
+              <button
+                key={tab.estado}
+                onClick={() => setTabActivo(tab.estado)}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-sm font-bold transition-colors ${
+                  isActive
+                    ? tab.activeColor
+                    : "bg-zinc-50 text-zinc-500 active:bg-zinc-100"
+                }`}
+              >
+                {tab.label}
+                <span
+                  className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-extrabold ${
+                    isActive
+                      ? "bg-white/25 text-white"
+                      : "bg-zinc-200 text-zinc-600"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content */}
+      <main>
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <span className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-zinc-900" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {ESTADOS.map((estado) => (
-              <OrderColumn
-                key={estado}
-                estado={estado}
-                pedidos={pedidos.filter((p) => p.estado === estado)}
-                onAvanzar={handleAvanzar}
-              />
-            ))}
-          </div>
+          <OrderStack
+            pedidos={pedidosFiltrados}
+            onAvanzar={handleAvanzar}
+          />
         )}
       </main>
     </div>
