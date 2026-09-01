@@ -21,27 +21,30 @@ export default function OrderStack({
     );
   }
 
-  // Show top card fully, peek at the next few behind it
-  const topPedido = pedidos[0];
-  const behindCount = Math.min(pedidos.length - 1, 3);
+  // FIFO: oldest first (front of stack), newest at the back
+  const sorted = [...pedidos].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  const topPedido = sorted[0];
+  const behindCount = Math.min(sorted.length - 1, 3);
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 pt-4 pb-6">
-      {/* Stack container */}
-      <div className="relative">
-        {/* Behind cards (decorative peek) */}
+    <div className="mx-auto w-full max-w-lg px-4 pb-6">
+      {/* Stack: cards behind peek upward above the top card */}
+      <div className="relative" style={{ marginTop: `${behindCount * 10 + 16}px` }}>
+        {/* Behind cards — peek upward */}
         {Array.from({ length: behindCount }).map((_, i) => {
-          const offset = (i + 1) * 6;
-          const scale = 1 - (i + 1) * 0.03;
+          const peekUp = (i + 1) * 10;
+          const scale = 1 - (i + 1) * 0.04;
           return (
             <div
               key={`behind-${i}`}
-              className="absolute inset-x-0 top-0 rounded-2xl border-2 border-zinc-200 bg-white shadow-sm"
+              className="pointer-events-none absolute inset-x-0 top-0 rounded-2xl border-2 border-zinc-300 bg-zinc-100"
               style={{
-                transform: `translateY(${offset}px) scale(${scale})`,
+                transform: `translateY(-${peekUp}px) scale(${scale})`,
                 zIndex: behindCount - i,
-                height: "100%",
-                opacity: 1 - (i + 1) * 0.15,
+                height: "60px",
               }}
             />
           );
@@ -49,20 +52,9 @@ export default function OrderStack({
 
         {/* Top card — fully interactive */}
         <div className="relative" style={{ zIndex: behindCount + 1 }}>
-          <OrderCard
-            pedido={topPedido}
-            onAvanzar={onAvanzar}
-          />
+          <OrderCard pedido={topPedido} onAvanzar={onAvanzar} />
         </div>
       </div>
-
-      {/* Remaining count */}
-      {pedidos.length > 1 && (
-        <p className="mt-4 text-center text-sm font-semibold text-zinc-400">
-          +{pedidos.length - 1} pedido{pedidos.length - 1 > 1 ? "s" : ""} más
-          en la pila
-        </p>
-      )}
     </div>
   );
 }

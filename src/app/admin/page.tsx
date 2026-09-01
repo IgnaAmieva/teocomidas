@@ -116,8 +116,8 @@ export default function AdminPage() {
       </header>
 
       {/* Tabs de estado */}
-      <div className="sticky top-[61px] z-30 border-b border-zinc-200 bg-white px-2 py-2">
-        <div className="flex gap-1.5">
+      <div className="sticky top-[61px] z-30 overflow-hidden border-b border-zinc-200 bg-white px-1.5 py-2">
+        <div className="grid grid-cols-4 gap-1">
           {TABS.map((tab) => {
             const isActive = tabActivo === tab.estado;
             const count = contadores[tab.estado];
@@ -125,15 +125,15 @@ export default function AdminPage() {
               <button
                 key={tab.estado}
                 onClick={() => setTabActivo(tab.estado)}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-sm font-bold transition-colors ${
+                className={`flex flex-col items-center justify-center rounded-xl py-2.5 text-xs font-bold transition-colors ${
                   isActive
                     ? tab.activeColor
                     : "bg-zinc-50 text-zinc-500 active:bg-zinc-100"
                 }`}
               >
-                {tab.label}
+                <span className="leading-tight">{tab.label}</span>
                 <span
-                  className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-extrabold ${
+                  className={`mt-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full text-[10px] font-extrabold ${
                     isActive
                       ? "bg-white/25 text-white"
                       : "bg-zinc-200 text-zinc-600"
