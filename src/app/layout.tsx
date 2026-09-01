@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import ServiceWorkerRegister from "@/components/sw-register";
+import InstallBanner from "@/components/install-banner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({
         <main className="mx-auto min-h-screen max-w-lg pb-20">
           {children}
         </main>
+        <InstallBanner />
         <BottomNav />
       </body>
     </html>
