@@ -97,7 +97,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(pedidoResult, { status: 500 });
     }
 
-    // 2. Crear preferencia de pago en Mercado Pago
+    // 2. Si paga en efectivo, no crear preferencia de MP
+    if (form.metodo_pago === "efectivo") {
+      return NextResponse.json({
+        success: true,
+        data: {
+          pedidoId: pedidoResult.data.id,
+          numeroPedido: pedidoResult.data.numero_pedido,
+          metodoPago: "efectivo" as const,
+        },
+      });
+    }
+
+    // 3. Crear preferencia de pago en Mercado Pago
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL || `https://${req.headers.get("host")}`;
 
@@ -117,6 +129,7 @@ export async function POST(req: NextRequest) {
       data: {
         pedidoId: pedidoResult.data.id,
         numeroPedido: pedidoResult.data.numero_pedido,
+        metodoPago: "mercado_pago" as const,
         initPoint: mpResult.data.initPoint,
       },
     });

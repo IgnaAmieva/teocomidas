@@ -77,6 +77,15 @@ export default function OrderCard({
         )}
       </div>
 
+      {/* Alerta efectivo */}
+      {pedido.metodo_pago === "efectivo" && (
+        <div className="mt-3 rounded-xl bg-amber-100 border border-amber-300 px-3 py-2">
+          <p className="text-center text-sm font-bold text-amber-800">
+            💵 EFECTIVO — cobrar en caja
+          </p>
+        </div>
+      )}
+
       {/* Auto car info — color/modelo como dato secundario */}
       {esAutoCar && pedido.color_auto && (
         <div className="mt-3 rounded-xl bg-blue-50 px-3 py-2">

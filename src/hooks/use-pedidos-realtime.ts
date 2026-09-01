@@ -37,7 +37,7 @@ export function usePedidosRealtime({
     let query = supabase
       .from("pedidos")
       .select("*")
-      .eq("mp_status", "approved")
+      .or("mp_status.eq.approved,metodo_pago.eq.efectivo")
       .order("created_at", { ascending: false });
 
     if (soloHoy) {
@@ -70,7 +70,10 @@ export function usePedidosRealtime({
         (payload) => {
           const pedido = payload.new as Pedido;
 
-          if (payload.eventType === "INSERT" && pedido.mp_status === "approved") {
+          const esVisible =
+            pedido.mp_status === "approved" || pedido.metodo_pago === "efectivo";
+
+          if (payload.eventType === "INSERT" && esVisible) {
             setPedidos((prev) => [pedido, ...prev]);
             onNuevoPedidoRef.current?.();
           }
@@ -83,7 +86,7 @@ export function usePedidosRealtime({
             );
 
             // Un pedido que pasa de pending a approved también es "nuevo"
-            if (pedido.mp_status === "approved") {
+            if (esVisible) {
               const existed = pedidos.some((p) => p.id === pedido.id);
               if (!existed) {
                 setPedidos((prev) => {

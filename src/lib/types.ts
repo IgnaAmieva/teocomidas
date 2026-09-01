@@ -26,6 +26,8 @@ export type EstadoPedido =
   | "listo"
   | "entregado";
 
+export type MetodoPago = "mercado_pago" | "efectivo";
+
 export type MpStatus = "pending" | "approved" | "rejected";
 
 export interface PedidoItem {
@@ -46,6 +48,7 @@ export interface Pedido {
   nombre_cliente: string;
   color_auto: string | null;
   estado: EstadoPedido;
+  metodo_pago: MetodoPago;
   mp_payment_id: string | null;
   mp_status: MpStatus;
 }
@@ -55,6 +58,7 @@ export interface CheckoutFormData {
   horario: "asap" | string;
   nombre_cliente: string;
   color_auto: string;
+  metodo_pago: MetodoPago;
 }
 
 // --- Result type genérico ---

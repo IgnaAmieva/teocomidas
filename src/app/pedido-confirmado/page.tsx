@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
 
-type PaymentStatus = "approved" | "rejected" | "pending" | "unknown";
+type PaymentStatus = "approved" | "rejected" | "pending" | "efectivo" | "unknown";
 
 const statusConfig: Record<
   PaymentStatus,
@@ -16,6 +16,13 @@ const statusConfig: Record<
     title: "Pago aprobado",
     description:
       "Tu pedido ya está en preparación. Te avisamos cuando esté listo.",
+    color: "text-green-600",
+  },
+  efectivo: {
+    icon: "✅",
+    title: "Pedido confirmado",
+    description:
+      "Pagás en el local al retirar tu pedido.",
     color: "text-green-600",
   },
   pending: {
@@ -40,10 +47,11 @@ const statusConfig: Record<
   },
 };
 
-function resolveStatus(param: string | null): PaymentStatus {
-  if (param === "approved") return "approved";
-  if (param === "rejected") return "rejected";
-  if (param === "pending" || param === "in_process") return "pending";
+function resolveStatus(metodoPago: string | null, mpStatus: string | null): PaymentStatus {
+  if (metodoPago === "efectivo") return "efectivo";
+  if (mpStatus === "approved") return "approved";
+  if (mpStatus === "rejected") return "rejected";
+  if (mpStatus === "pending" || mpStatus === "in_process") return "pending";
   return "unknown";
 }
 
@@ -54,12 +62,13 @@ function PedidoConfirmadoContent() {
 
   const mpStatus =
     searchParams.get("collection_status") || searchParams.get("status");
+  const metodoPago = searchParams.get("metodo_pago");
   const numeroPedido = searchParams.get("numero_pedido");
-  const status = resolveStatus(mpStatus);
+  const status = resolveStatus(metodoPago, mpStatus);
   const config = statusConfig[status];
 
   useEffect(() => {
-    if (status === "approved" && !clearedRef.current) {
+    if ((status === "approved" || status === "efectivo") && !clearedRef.current) {
       clearedRef.current = true;
       clearCart();
     }

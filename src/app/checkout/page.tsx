@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/format";
 import { getHorariosDisponibles } from "@/lib/horarios";
-import type { CheckoutFormData, Modalidad, Result } from "@/lib/types";
+import type { CheckoutFormData, MetodoPago, Modalidad, Result } from "@/lib/types";
 
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
@@ -21,6 +21,7 @@ export default function CheckoutPage() {
     horario: "asap",
     nombre_cliente: "",
     color_auto: "",
+    metodo_pago: "mercado_pago",
   });
 
   const [horarios, setHorarios] = useState<string[]>([]);
@@ -79,7 +80,8 @@ export default function CheckoutPage() {
       const result: Result<{
         pedidoId: string;
         numeroPedido: number;
-        initPoint: string;
+        metodoPago: MetodoPago;
+        initPoint?: string;
       }> = await res.json();
 
       if (!result.success) {
@@ -88,8 +90,14 @@ export default function CheckoutPage() {
         return;
       }
 
+      if (result.data.metodoPago === "efectivo") {
+        // Pago en efectivo: ir directo a confirmación
+        window.location.href = `/pedido-confirmado?numero_pedido=${result.data.numeroPedido}&metodo_pago=efectivo`;
+        return;
+      }
+
       // Redirigir al checkout de Mercado Pago
-      window.location.href = result.data.initPoint;
+      window.location.href = result.data.initPoint!;
     } catch {
       setError("Error de conexión. Intentá de nuevo.");
       setSubmitting(false);
@@ -199,7 +207,38 @@ export default function CheckoutPage() {
         </div>
       </section>
 
-      {/* 4. Resumen del pedido */}
+      {/* 4. Método de pago */}
+      <section className="mt-6">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+          Método de pago
+        </h2>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <button
+            onClick={() => updateField("metodo_pago", "mercado_pago")}
+            className={`rounded-2xl border-2 px-4 py-4 text-center font-bold transition-colors ${
+              form.metodo_pago === "mercado_pago"
+                ? "border-zinc-900 bg-zinc-900 text-white"
+                : "border-zinc-200 bg-white text-zinc-700 active:bg-zinc-50"
+            }`}
+          >
+            <span className="block text-2xl">💳</span>
+            Pagar online
+          </button>
+          <button
+            onClick={() => updateField("metodo_pago", "efectivo")}
+            className={`rounded-2xl border-2 px-4 py-4 text-center font-bold transition-colors ${
+              form.metodo_pago === "efectivo"
+                ? "border-zinc-900 bg-zinc-900 text-white"
+                : "border-zinc-200 bg-white text-zinc-700 active:bg-zinc-50"
+            }`}
+          >
+            <span className="block text-2xl">💵</span>
+            Efectivo en el local
+          </button>
+        </div>
+      </section>
+
+      {/* 5. Resumen del pedido */}
       <section className="mt-6">
         <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
           Tu pedido
@@ -235,14 +274,20 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      {/* 5. Botón pagar */}
+      {/* 6. Botón confirmar */}
       <button
         onClick={handleSubmit}
         disabled={!canSubmit || submitting}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#009ee3] py-4 text-base font-bold text-white transition-colors active:bg-[#0081c2] disabled:opacity-50"
+        className={`mt-6 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-bold text-white transition-colors disabled:opacity-50 ${
+          form.metodo_pago === "efectivo"
+            ? "bg-zinc-900 active:bg-zinc-700"
+            : "bg-[#009ee3] active:bg-[#0081c2]"
+        }`}
       >
         {submitting ? (
           <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+        ) : form.metodo_pago === "efectivo" ? (
+          "Confirmar pedido"
         ) : (
           <>
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">

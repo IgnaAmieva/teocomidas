@@ -43,6 +43,8 @@ create table if not exists pedidos (
   color_auto text,
   estado text not null default 'pendiente'
     check (estado in ('pendiente', 'en_preparacion', 'listo', 'entregado')),
+  metodo_pago text not null default 'mercado_pago'
+    check (metodo_pago in ('mercado_pago', 'efectivo')),
   mp_payment_id text,
   mp_status text not null default 'pending'
     check (mp_status in ('pending', 'approved', 'rejected'))

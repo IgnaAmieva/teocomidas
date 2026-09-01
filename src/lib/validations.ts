@@ -8,6 +8,7 @@ export const checkoutFormSchema = z.object({
     .min(2, "El nombre debe tener al menos 2 caracteres")
     .max(100, "El nombre es demasiado largo"),
   color_auto: z.string().max(100).default(""),
+  metodo_pago: z.enum(["mercado_pago", "efectivo"]),
 });
 
 export const checkoutItemSchema = z.object({

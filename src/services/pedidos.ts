@@ -27,6 +27,7 @@ export async function createPedido(
         items: pedidoItems,
         total: params.total,
         modalidad: params.form.modalidad,
+        metodo_pago: params.form.metodo_pago,
         horario_solicitado:
           params.form.horario === "asap" ? null : params.form.horario,
         nombre_cliente: params.form.nombre_cliente,
