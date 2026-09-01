@@ -4,6 +4,9 @@ import type { CartItem, Result } from "@/lib/types";
 
 function getClient() {
   const { MP_ACCESS_TOKEN } = getServerEnv();
+  if (!MP_ACCESS_TOKEN) {
+    throw new Error("MP_ACCESS_TOKEN no está configurado");
+  }
   return new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
 }
 

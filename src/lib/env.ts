@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 const serverEnvSchema = z.object({
-  MP_ACCESS_TOKEN: z.string().min(1, "MP_ACCESS_TOKEN es requerido"),
   SUPABASE_SERVICE_ROLE_KEY: z
     .string()
     .min(1, "SUPABASE_SERVICE_ROLE_KEY es requerido"),
+  MP_ACCESS_TOKEN: z.string().optional().default(""),
   MP_WEBHOOK_SECRET: z.string().optional().default(""),
 });
 
