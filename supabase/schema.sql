@@ -60,11 +60,12 @@ create policy "pedidos_insert_anon"
   to anon
   with check (true);
 
--- SELECT: NADIE puede leer pedidos con anon key.
--- El admin lee via service_role (que bypasea RLS).
--- Esto previene enumeración de pedidos y fuga de datos de clientes.
--- (Si en el futuro el cliente necesita ver SU pedido, agregar
---  una policy con filtro por algún token único, nunca lectura total.)
+-- SELECT: solo usuarios autenticados (admin) pueden leer pedidos.
+-- Anon NO puede leer — previene enumeración y fuga de datos.
+create policy "pedidos_select_authenticated"
+  on pedidos for select
+  to authenticated
+  using (true);
 
 -- UPDATE/DELETE: ninguna policy para anon ni authenticated.
 -- Solo service_role puede actualizar pedidos (webhook y admin API).
